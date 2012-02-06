@@ -23,8 +23,9 @@ import java.util.HashMap;
 
 import org.apache.wicket.IPageFactory;
 import org.apache.wicket.Page;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.WicketRuntimeException;
+import org.apache.wicket.request.component.IRequestablePage;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.ops4j.pax.wicket.api.PageFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
@@ -71,7 +72,7 @@ public final class PaxWicketPageFactory implements IPageFactory {
      *
      * @throws org.apache.wicket.WicketRuntimeException Thrown if the page cannot be constructed
      */
-    public final <C extends Page> Page newPage(Class<C> pageClass) throws IllegalArgumentException {
+    public final <C extends IRequestablePage> IRequestablePage newPage(Class<C> pageClass) throws IllegalArgumentException {
         validateNotNull(pageClass, "pageClass");
 
         return newPage(pageClass, null);
@@ -89,7 +90,7 @@ public final class PaxWicketPageFactory implements IPageFactory {
      *
      * @throws org.apache.wicket.WicketRuntimeException Thrown if the page cannot be constructed
      */
-    public final <C extends Page> Page newPage(Class<C> pageClass, PageParameters parameters)
+    public final <C extends IRequestablePage> IRequestablePage newPage(Class<C> pageClass, PageParameters parameters)
         throws IllegalArgumentException {
         validateNotNull(pageClass, "pageClass");
 
@@ -103,7 +104,7 @@ public final class PaxWicketPageFactory implements IPageFactory {
             try {
                 try {
                     final Constructor<?> ctr = pageClass.getConstructor(PageParameters.class);
-                    return (Page) ctr.newInstance(parameters == null ? PageParameters.NULL : parameters);
+                    return (Page) ctr.newInstance(parameters);
                 } catch (NoSuchMethodException e) {
                     return pageClass.newInstance();
                 }
@@ -142,4 +143,9 @@ public final class PaxWicketPageFactory implements IPageFactory {
             contents.remove(pageClass);
         }
     }
+
+	public <C extends IRequestablePage> boolean isBookmarkable(Class<C> pageClass) {
+		// TODO implement this.
+		return false;
+	}
 }
